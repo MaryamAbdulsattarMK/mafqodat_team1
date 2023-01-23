@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'django_filters',
+    'rest_framework_simplejwt.token_blacklist',
     'rest_framework.authtoken',
     'helpers',
     'mafqodatAPI',
@@ -67,7 +68,8 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'mafqodatAPI.jwt.JWTAuthentication',
+        #'mafqodatAPI.jwt.JWTAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
         #'rest_framework.authentication.TokenAuthentication',
     ],
 

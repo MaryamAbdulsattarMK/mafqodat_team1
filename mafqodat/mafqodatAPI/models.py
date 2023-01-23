@@ -1,110 +1,67 @@
 import datetime
-
 import jwt
+from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db import models
-from helpers import models as modul
+# from helpers import models as modul
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import (AbstractBaseUser, PermissionsMixin, UserManager)
 from django.utils import timezone
-from datetime import datetime,timedelta
+from datetime import datetime, timedelta
 # Create your models here.
 from django.conf import settings
+from rest_framework_simplejwt.tokens import RefreshToken
 
-class MyUserManager(UserManager):
-    def _create_user(self, username, email, password, **extra_fields):
-        """
-        Create and save a user with the given username, email, and password.
-        """
-        if not username:
-            raise ValueError("The given username must be set")
-        if not email:
-            raise ValueError("The given username must be set")
-        email = self.normalize_email(email)
 
-        username = self.model.normalize_username(username)
-        user = self.model(username=username, email=email, **extra_fields)
+class MyUserManager(BaseUserManager):
+    def create_user(self, username, email, password=None):
+        if username is None:
+            raise TypeError('Users should have a username')
+        if email is None:
+            raise TypeError('Users should have a Email')
+
+        user = self.model(username=username, email=self.normalize_email(email))
         user.set_password(password)
-        user.save(using=self._db)
+        user.save()
         return user
 
-    def create_user(self, username, email, password=None, **extra_fields):
-        extra_fields.setdefault("is_staff", False)
-        extra_fields.setdefault("is_superuser", False)
-        return self._create_user(username, email, password, **extra_fields)
+    def create_superuser(self, username, email, password=None):
+        if password is None:
+            raise TypeError('Password should not be none')
 
-    def create_superuser(self, username, email, password=None, **extra_fields):
-        extra_fields.setdefault("is_staff", True)
-        extra_fields.setdefault("is_superuser", True)
-
-        if extra_fields.get("is_staff") is not True:
-            raise ValueError("Superuser must have is_staff=True.")
-        if extra_fields.get("is_superuser") is not True:
-            raise ValueError("Superuser must have is_superuser=True.")
-
-        return self._create_user(username, email, password, **extra_fields)
+        user = self.create_user(username, email, password)
+        user.is_superuser = True
+        user.is_staff = True
+        user.save()
+        return user
 
 
-class myUser(AbstractBaseUser,PermissionsMixin,modul.TrackingModel):
-    """
-     An abstract base class implementing a fully featured User model with
-     admin-compliant permissions.
+AUTH_PROVIDERS = {'facebook': 'facebook', 'google': 'google','twitter': 'twitter', 'email': 'email'}
 
-     Username and password are required. Other fields are optional.
-     """
 
-   # DoesNotExist = None
-    username_validator = UnicodeUsernameValidator()
+class myUser(AbstractBaseUser, PermissionsMixin):
+    username = models.CharField(max_length=255, unique=True, db_index=True)
+    email = models.EmailField(max_length=255, unique=True, db_index=True)
+    is_verified = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    auth_provider = models.CharField(
+        max_length=255, blank=False,
+        null=False, default=AUTH_PROVIDERS.get('email'))
 
-    username = models.CharField(
-        _("username"),
-        max_length=150,
-        unique=True,
-        help_text=_(
-            "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
-        ),
-        validators=[username_validator],
-        error_messages={
-            "unique": _("A user with that username already exists."),
-        },
-    )
-
-    email = models.EmailField(_("email address"), blank=False,unique=True )
-    is_staff = models.BooleanField(
-        _("staff status"),
-        default=False,
-        help_text=_("Designates whether the user can log into this admin site."),
-    )
-    is_active = models.BooleanField(
-        _("active"),
-        default=True,
-        help_text=_(
-            "Designates whether this user should be treated as active. "
-            "Unselect this instead of deleting accounts."
-        ),
-    )
-    date_joined = models.DateTimeField(_("date joined"), default=timezone.now)
-    email_verified=models.BooleanField(
-        _("email_verified"),
-        default=False,
-        help_text=_(
-            "Designates whether this user email is verified. "
-        ),
-    )
-    objects = MyUserManager()
-
-    EMAIL_FIELD = "email"
+   # EMAIL_FIELD = "email"
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username"]
+    objects = MyUserManager()
 
-    @property
-    def token(self):
+    def __str__(self):
+        return self.email
 
-        token = jwt.encode(
-            {'usernaem':self.username,'email':self.email,
-             'exp': datetime.utcnow() + timedelta(hours=24)},
-             settings.SECRET_KEY,algorithm='HS256')
-        return token
-
-
-
+    def tokens(self):
+        refresh = RefreshToken.for_user(self)
+        return {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token)
+        }
