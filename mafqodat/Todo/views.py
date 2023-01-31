@@ -25,7 +25,7 @@ class PostAPIView(ListCreateAPIView):
         return serializer.save()
 
     def get_queryset(self):
-        return Post.objects.filter()
+        return Post.objects.filter().values()
 
 
 class Postfor_mobile_APIView(ListCreateAPIView):
@@ -41,7 +41,7 @@ class Postfor_mobile_APIView(ListCreateAPIView):
         return serializer.save()
 
     def get_queryset(self):
-        return Post.objects.filter
+        return Post.objects.filter(id='id',name='Name',location='location',type_id='type_id',phone_number="mobile_number").values()
 
 
 class PostDetailAPIView(RetrieveUpdateDestroyAPIView):
@@ -50,7 +50,7 @@ class PostDetailAPIView(RetrieveUpdateDestroyAPIView):
     serializer_class = PostSerializer
     lookup_field = 'id'
     def get_queryset(self):
-        return Post.objects.filter()
+        return Post.objects.filter().values()
 
 
 
@@ -60,15 +60,15 @@ class Type_ItemAPIView(ListCreateAPIView):
     permission_classes = (IsAuthenticated,)  # permission classes
     serializer_class = Type_itemSerializer
     filter_backends = [DjangoFilterBackend,filters.SearchFilter,filters.OrderingFilter]
-    filterset_fields = ['id','name_type']
-    search_feilds = ['id','name_type']
-    ordering_feilds = ['id','name_type']
+    #filterset_fields = ['id','name_type']
+    #search_feilds = ['id','name_type']
+    #ordering_feilds = ['id','name_type']
 
     def perform_create(self,serializer):
         return serializer.save()
 
     def get_queryset(self):
-        return Post.objects.filter()
+        return Post.objects.filter().values()
 
 
 class Type_ItemDetailAPIView(RetrieveUpdateDestroyAPIView):
@@ -77,7 +77,7 @@ class Type_ItemDetailAPIView(RetrieveUpdateDestroyAPIView):
     serializer_class = Type_itemSerializer
     lookup_field = 'id'
     def get_queryset(self):
-        return Post.objects.filter()
+        return Post.objects.filter().values()
 
 
 

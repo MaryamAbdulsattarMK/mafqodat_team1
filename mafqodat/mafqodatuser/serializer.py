@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import myUser
+from .models import myUser_for_mobile
 from django.contrib import auth
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
@@ -7,8 +7,11 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import smart_str, force_str, smart_bytes, DjangoUnicodeDecodeError
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 
+# for mobile
 
-class RegisterSerializer(serializers.ModelSerializer):
+
+
+class RegisterSerializer_for_mobile(serializers.ModelSerializer):
     password = serializers.CharField(
         max_length=68, min_length=6, write_only=True)
 
@@ -16,7 +19,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         'username': 'The username should only contain alphanumeric characters'}
 
     class Meta:
-        model = myUser
+        model = myUser_for_mobile
         fields = ['email', 'username', 'password']
 
     def validate(self, attrs):
@@ -29,18 +32,18 @@ class RegisterSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        return myUser.objects.create_superuser(**validated_data)
+        return myUser_for_mobile.objects.create_user_for_mobile(**validated_data)
 
 
-class EmailVerificationSerializer(serializers.ModelSerializer):
+class EmailVerificationSerializer_for_mobile(serializers.ModelSerializer):
     token = serializers.CharField(max_length=555)
 
     class Meta:
-        model = myUser
+        model = myUser_for_mobile
         fields = ['token']
 
 
-class LoginSerializer(serializers.ModelSerializer):
+class LoginSerializer_for_mobile(serializers.ModelSerializer):
     email = serializers.EmailField(max_length=255, min_length=3)
     password = serializers.CharField(
         max_length=68, min_length=6, write_only=True)
@@ -50,21 +53,21 @@ class LoginSerializer(serializers.ModelSerializer):
     tokens = serializers.SerializerMethodField()
 
     def get_tokens(self, obj):
-        user = myUser.objects.get(email=obj['email'])
+        user = myUser_for_mobile.objects.get(email=obj['email'])
 
         return {
-            'refresh': user.tokens()['refresh'],
-            'access': user.tokens()['access']
+            'refresh': user.token()['refresh'],
+            'access': user.token()['access']
         }
 
     class Meta:
-        model = myUser
+        model = myUser_for_mobile
         fields = ['email', 'password', 'username', 'tokens']
 
     def validate(self, attrs):
         email = attrs.get('email', '')
         password = attrs.get('password', '')
-        filtered_user_by_email = myUser.objects.filter(email=email)
+        filtered_user_by_email = myUser_for_mobile.objects.filter(email=email)
         user = auth.authenticate(email=email, password=password)
 
         if filtered_user_by_email.exists() and filtered_user_by_email[0].auth_provider != 'email':
@@ -87,7 +90,7 @@ class LoginSerializer(serializers.ModelSerializer):
         return super().validate(attrs)
 
 
-class ResetPasswordEmailRequestSerializer(serializers.Serializer):
+class ResetPasswordEmailRequestSerializer_for_mobile(serializers.Serializer):
     email = serializers.EmailField(min_length=2)
 
     redirect_url = serializers.CharField(max_length=500, required=False)
@@ -96,7 +99,7 @@ class ResetPasswordEmailRequestSerializer(serializers.Serializer):
         fields = ['email']
 
 
-class SetNewPasswordSerializer(serializers.Serializer):
+class SetNewPasswordSerializer_for_mobile(serializers.Serializer):
     password = serializers.CharField(
         min_length=6, max_length=68, write_only=True)
     token = serializers.CharField(
@@ -114,7 +117,7 @@ class SetNewPasswordSerializer(serializers.Serializer):
             uidb64 = attrs.get('uidb64')
 
             id = force_str(urlsafe_base64_decode(uidb64))
-            user = myUser.objects.get(id=id)
+            user = myUser_for_mobile.objects.get(id=id)
             if not PasswordResetTokenGenerator().check_token(user, token):
                 raise AuthenticationFailed('The reset link is invalid', 401)
 
@@ -127,7 +130,7 @@ class SetNewPasswordSerializer(serializers.Serializer):
         return super().validate(attrs)
 
 
-class LogoutSerializer(serializers.Serializer):
+class LogoutSerializer_for_mobile(serializers.Serializer):
     refresh = serializers.CharField()
 
     default_error_message = {
@@ -145,4 +148,3 @@ class LogoutSerializer(serializers.Serializer):
 
         except TokenError:
             self.fail('bad_token')
-

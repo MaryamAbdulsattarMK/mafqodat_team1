@@ -1,16 +1,15 @@
-import datetime
-import jwt
+
 from django.contrib.auth.base_user import BaseUserManager
-from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.db import models
-# from helpers import models as modul
-from django.utils.translation import gettext_lazy as _
-from django.contrib.auth.models import (AbstractBaseUser, PermissionsMixin, UserManager)
-from django.utils import timezone
-from datetime import datetime, timedelta
-# Create your models here.
-from django.conf import settings
+
+from django.contrib.auth.models import (AbstractBaseUser, PermissionsMixin, UserManager, AbstractUser)
 from rest_framework_simplejwt.tokens import RefreshToken
+
+
+#class User(AbstractUser):
+#  #Boolean fields to select the type of account.
+#  is_Admin = models.BooleanField(default=False)
+#  is_user = models.BooleanField(default=False)
 
 
 class MyUserManager(BaseUserManager):
@@ -44,7 +43,7 @@ class myUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=255, unique=True, db_index=True)
     is_verified = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     auth_provider = models.CharField(
@@ -65,3 +64,6 @@ class myUser(AbstractBaseUser, PermissionsMixin):
             'refresh': str(refresh),
             'access': str(refresh.access_token)
         }
+
+
+

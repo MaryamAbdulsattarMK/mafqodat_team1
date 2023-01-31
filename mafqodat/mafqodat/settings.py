@@ -16,8 +16,8 @@ from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
-MEDIA_URL='/Photos/'
-MEDIA_ROOT=os.path.join(BASE_DIR,"Photos")
+MEDIA_URL='/Photo/'
+MEDIA_ROOT=os.path.join(BASE_DIR,"Photo")
 
 
 # Quick-start development settings - unsuitable for production
@@ -45,13 +45,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'drf_yasg',
     'django_filters',
     'rest_framework_simplejwt.token_blacklist',
     'rest_framework.authtoken',
     'helpers',
     'mafqodatAPI',
-    'Todo'
-    #'coreapi',
+    'Todo',
+    'mafqodatuser',
+    'coreapi',
 
 ]
 
@@ -76,6 +78,17 @@ REST_FRAMEWORK = {
 }
 
 
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+
+    'SLIDING_TOKEN_LIFETIME': timedelta(hours=1),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1)
+}
+
+
+
+
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -89,6 +102,18 @@ MIDDLEWARE = [
 
 
 ROOT_URLCONF = 'mafqodat.urls'
+
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+        }
+    }
+}
+
 
 TEMPLATES = [
     {
@@ -114,7 +139,7 @@ WSGI_APPLICATION = 'mafqodat.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'mafqodat_team1',
+        'NAME': 'mafqodatteam1',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': '127.0.0.1',
