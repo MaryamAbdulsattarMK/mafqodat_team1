@@ -1,15 +1,16 @@
 from rest_framework import generics, status, views, permissions
-from .serializer import RegisterSerializer, SetNewPasswordSerializer, ResetPasswordEmailRequestSerializer, \
-    EmailVerificationSerializer, LoginSerializer, LogoutSerializer, RegisterSerializer_for_mobile
+from .serializer import RegisterSerializer_for_mobile, \
+    EmailVerificationSerializer_for_mobile, LoginSerializer_for_mobile, ResetPasswordEmailRequestSerializer_for_mobile, \
+    SetNewPasswordSerializer_for_mobile, LogoutSerializer_for_mobile
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import myUser
-from .Utlis import Util
+from .models import  myUser_for_mobile
+
 import jwt
 from django.conf import settings
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-from .renders import UserRenderer
+
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.encoding import smart_str, force_str, smart_bytes, DjangoUnicodeDecodeError
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
@@ -19,39 +20,15 @@ from django.urls import reverse
 from django.http import HttpResponsePermanentRedirect
 import os
 
-
 class CustomRedirect(HttpResponsePermanentRedirect):
     allowed_schemes = [os.environ.get('APP_SCHEME'), 'http', 'https']
 
-
-class RegisterView(generics.GenericAPIView):
-    serializer_class = RegisterSerializer
-    renderer_classes = (UserRenderer,)
-
-    def post(self, request):
-        user = request.data
-        serializer = self.serializer_class(data=user)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        user_data = serializer.data
-        user = myUser.objects.get(email=user_data['email'])
-        token = RefreshToken.for_user(user).access_token
-        current_site = get_current_site(request).domain
-        relativeLink = reverse('email-verify')
-        absurl = 'http://' + current_site + relativeLink + "?token=" + str(token)
-        email_body = 'Hi ' + user.username + \
-                     ' Use the link below to verify your email \n' + absurl
-        data = {'email_body': email_body, 'to_email': user.email,
-                'email_subject': 'Verify your email'}
-
-        Util.send_email(data)
-        return Response(user_data, status=status.HTTP_201_CREATED)
+# for mobile
 
 
-
-'''class RegisterView_for_mobile(generics.GenericAPIView):
+class RegisterView_for_mobile(generics.GenericAPIView):
     serializer_class = RegisterSerializer_for_mobile
-    renderer_classes = (UserRenderer,)
+    #renderer_classes = (UserRenderer,)
 
     def post(self, request):
         user = request.data
@@ -59,22 +36,15 @@ class RegisterView(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         user_data = serializer.data
-        user = myUser.objects.get(email=user_data['email'])
-        token = RefreshToken.for_user(user).access_token
-        current_site = get_current_site(request).domain
-        relativeLink = reverse('email-verify')
+        user = myUser_for_mobile.objects.get(email=user_data['email'])
 
 
- 
+        #Util.send_email(data)
         return Response(user_data, status=status.HTTP_201_CREATED)
 
 
-'''
-
-
-
-class VerifyEmail(views.APIView):
-    serializer_class = EmailVerificationSerializer
+class VerifyEmail_for_mobile(views.APIView):
+    serializer_class = EmailVerificationSerializer_for_mobile
 
     token_param_config = openapi.Parameter(
         'token', in_=openapi.IN_QUERY, description='Description', type=openapi.TYPE_STRING)
@@ -84,7 +54,7 @@ class VerifyEmail(views.APIView):
         token = request.GET.get('token')
         try:
             payload = jwt.decode(token, settings.SECRET_KEY)
-            user = myUser.objects.get(id=payload['user_id'])
+            user = myUser_for_mobile.objects.get(id=payload['user_id'])
             if not user.is_verified:
                 user.is_verified = True
                 user.save()
@@ -95,8 +65,8 @@ class VerifyEmail(views.APIView):
             return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class LoginAPIView(generics.GenericAPIView):
-    serializer_class = LoginSerializer
+class LoginAPIView_for_mobile(generics.GenericAPIView):
+    serializer_class = LoginSerializer_for_mobile
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -104,16 +74,16 @@ class LoginAPIView(generics.GenericAPIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class RequestPasswordResetEmail(generics.GenericAPIView):
-    serializer_class = ResetPasswordEmailRequestSerializer
+class RequestPasswordResetEmail_for_mobile(generics.GenericAPIView):
+    serializer_class = ResetPasswordEmailRequestSerializer_for_mobile
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
 
         email = request.data.get('email', '')
 
-        if myUser.objects.filter(email=email).exists():
-            user = myUser.objects.get(email=email)
+        if myUser_for_mobile.objects.filter(email=email).exists():
+            user = myUser_for_mobile.objects.get(email=email)
             uidb64 = urlsafe_base64_encode(smart_bytes(user.id))
             token = PasswordResetTokenGenerator().make_token(user)
             current_site = get_current_site(
@@ -127,12 +97,12 @@ class RequestPasswordResetEmail(generics.GenericAPIView):
                          absurl + "?redirect_url=" + redirect_url
             data = {'email_body': email_body, 'to_email': user.email,
                     'email_subject': 'Reset your passsword'}
-            Util.send_email(data)
+            #Util.send_email(data)
         return Response({'success': 'We have sent you a link to reset your password'}, status=status.HTTP_200_OK)
 
 
-class PasswordTokenCheckAPI(generics.GenericAPIView):
-    serializer_class = SetNewPasswordSerializer
+class PasswordTokenCheckAPI_for_mobile(generics.GenericAPIView):
+    serializer_class = SetNewPasswordSerializer_for_mobile
 
     def get(self, request, uidb64, token):
 
@@ -140,7 +110,7 @@ class PasswordTokenCheckAPI(generics.GenericAPIView):
 
         try:
             id = smart_str(urlsafe_base64_decode(uidb64))
-            user = myUser.objects.get(id=id)
+            user = myUser_for_mobile.objects.get(id=id)
 
             if not PasswordResetTokenGenerator().check_token(user, token):
                 if len(redirect_url) > 3:
@@ -164,8 +134,8 @@ class PasswordTokenCheckAPI(generics.GenericAPIView):
                                 status=status.HTTP_400_BAD_REQUEST)
 
 
-class SetNewPasswordAPIView(generics.GenericAPIView):
-    serializer_class = SetNewPasswordSerializer
+class SetNewPasswordAPIView_for_mobile(generics.GenericAPIView):
+    serializer_class = SetNewPasswordSerializer_for_mobile
 
     def patch(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -173,8 +143,8 @@ class SetNewPasswordAPIView(generics.GenericAPIView):
         return Response({'success': True, 'message': 'Password reset success'}, status=status.HTTP_200_OK)
 
 
-class LogoutAPIView(generics.GenericAPIView):
-    serializer_class = LogoutSerializer
+class LogoutAPIView_for_mobile(generics.GenericAPIView):
+    serializer_class = LogoutSerializer_for_mobile
 
     permission_classes = (permissions.IsAuthenticated,)
 
@@ -184,4 +154,3 @@ class LogoutAPIView(generics.GenericAPIView):
         serializer.save()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
-

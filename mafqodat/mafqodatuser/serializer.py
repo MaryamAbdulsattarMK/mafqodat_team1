@@ -56,7 +56,7 @@ class LoginSerializer_for_mobile(serializers.ModelSerializer):
         user = myUser_for_mobile.objects.get(email=obj['email'])
 
         return {
-            'refresh': user.token()['refresh'],
+
             'access': user.token()['access']
         }
 

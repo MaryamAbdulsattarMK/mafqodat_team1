@@ -32,6 +32,37 @@ class RegisterSerializer(serializers.ModelSerializer):
         return myUser.objects.create_superuser(**validated_data)
 
 
+
+
+
+class RegisterSerializer_for_mobile(serializers.ModelSerializer):
+    password = serializers.CharField(
+        max_length=68, min_length=6, write_only=True)
+
+    default_error_messages = {
+        'username': 'The username should only contain alphanumeric characters'}
+
+    class Meta:
+        model = myUser
+        fields = ['email', 'username', 'password']
+
+    def validate(self, attrs):
+        email = attrs.get('email', '')
+        username = attrs.get('username', '')
+
+        if not username.isalnum():
+            raise serializers.ValidationError(
+                self.default_error_messages)
+        return attrs
+
+    def create(self, validated_data):
+        return myUser.objects.create_user(**validated_data)
+
+
+
+
+
+
 class EmailVerificationSerializer(serializers.ModelSerializer):
     token = serializers.CharField(max_length=555)
 
