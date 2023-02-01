@@ -37,12 +37,12 @@ class Postfor_mobile_APIView(ListCreateAPIView):
     search_feilds = ['Name','location','type_id']
     ordering_feilds = ['Name','location','type_id']
 
+
     def perform_create(self,serializer):
         return serializer.save()
 
     def get_queryset(self):
-        return Post.objects.filter(id='id',name='Name',location='location',type_id='type_id',phone_number="mobile_number").values()
-
+        return Post.objects.defer("id","Name","location","type_id","image")
 
 class PostDetailAPIView(RetrieveUpdateDestroyAPIView):
     """This endpoint list all of the available todos from the database"""
@@ -50,7 +50,17 @@ class PostDetailAPIView(RetrieveUpdateDestroyAPIView):
     serializer_class = PostSerializer
     lookup_field = 'id'
     def get_queryset(self):
-        return Post.objects.filter().values()
+        return Post.objects.filter()
+
+
+
+class PostDetailAPIView_for_mobile(RetrieveUpdateDestroyAPIView):
+    """This endpoint list all of the available todos from the database"""
+    permission_classes = (IsAuthenticated,)  # permission classes
+    serializer_class = PostSerializer
+    lookup_field = 'id'
+    def get_queryset(self):
+        return Post.objects.defer("id","Name","location","type_id","image")
 
 
 
@@ -77,7 +87,7 @@ class Type_ItemDetailAPIView(RetrieveUpdateDestroyAPIView):
     serializer_class = Type_itemSerializer
     lookup_field = 'id'
     def get_queryset(self):
-        return Post.objects.filter().values()
+        return Post.objects.filter()
 
 
 

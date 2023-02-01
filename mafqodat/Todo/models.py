@@ -17,11 +17,11 @@ class Post(modul.TrackingModel):
     Name = models.CharField(max_length=250)
     image = models.ImageField(upload_to='photo/%y/%m/%d',default='default/1.png')
     location = models.CharField(max_length=250)
-    phone_number = models.IntegerField()
-    By_user= models.TextField()
+    phone_number = models.IntegerField(default=12345)
+    By_user= models.BooleanField(default=False)
     Date = models.DateField(auto_created=True,default=timezone.now)
-    chat_count = models.IntegerField()
-    Action = models.TextField()
+    chat_count = models.IntegerField(default=1)
+    Action = models.TextField(default="default")
     type_id = models.ForeignKey(Type_item, on_delete=models.CASCADE,default=1)
 
     def __str__(self):

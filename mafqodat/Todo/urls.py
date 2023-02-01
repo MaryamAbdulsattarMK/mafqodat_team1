@@ -10,9 +10,7 @@ urlpatterns = [
     path('<int:id>', PostDetailAPIView.as_view(), name='Post_Detail'),
     path('Type_item_create', Type_ItemAPIView.as_view(), name='Post_Detail'),
     path('Type_item_Update', Type_ItemDetailAPIView.as_view(), name='Post_Detail'),
-    path('Post_M', Postfor_mobile_APIView.as_view(), name='Post_Detail'),
-
-
+    path('Post_from_mobile', Postfor_mobile_APIView.as_view(), name='Post_Detail'),
     path('save', SaveFile, name='Post_Detail')
 
 

@@ -185,3 +185,7 @@ class LogoutAPIView(generics.GenericAPIView):
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
+class DeleteAPIView(generics.DestroyAPIView):
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
