@@ -177,3 +177,10 @@ class LogoutSerializer(serializers.Serializer):
         except TokenError:
             self.fail('bad_token')
 
+class ExpensesSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = myUser
+        fields = ['id','email','username','auth_provider', 'auth_token',
+                  'created_at', 'groups', 'is_active', 'is_staff', 'is_superuser', 'is_verified',  'updated_at'
+ ]

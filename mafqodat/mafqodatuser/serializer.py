@@ -148,3 +148,11 @@ class LogoutSerializer_for_mobile(serializers.Serializer):
 
         except TokenError:
             self.fail('bad_token')
+
+class ExpensesSerializer_mobile(serializers.ModelSerializer):
+
+    class Meta:
+        model = myUser_for_mobile
+        fields = ['id','email','username',
+                  'created_at',  'is_active', 'is_staff',  'is_verified',  'updated_at'
+ ]

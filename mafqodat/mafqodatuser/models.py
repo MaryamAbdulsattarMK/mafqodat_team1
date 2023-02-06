@@ -1,9 +1,11 @@
 from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
-from django.contrib.auth.models import PermissionsMixin, Permission
+from django.contrib.auth.models import PermissionsMixin, Permission, AnonymousUser
 from django.db import models
 
 # Create your models here.
 from rest_framework_simplejwt.tokens import  AccessToken
+
+#from ..mafqodatAPI.models import myUser
 
 AUTH_PROVIDERS = {'facebook': 'facebook', 'google': 'google', 'twitter': 'twitter', 'email': 'email'}
 
@@ -21,7 +23,7 @@ class MyUserManager_for_mobile(BaseUserManager):
         return user_for_mobile
 
 
-class myUser_for_mobile(AbstractBaseUser):
+class myUser_for_mobile(AbstractBaseUser,AnonymousUser):
     username = models.CharField(max_length=255, unique=True, db_index=True)
     email = models.EmailField(max_length=255, unique=True, db_index=True)
     is_staff = models.BooleanField(default=False)
@@ -30,6 +32,7 @@ class myUser_for_mobile(AbstractBaseUser):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     auth_provider = models.CharField(max_length=255, blank=False, null=False, default=AUTH_PROVIDERS.get('email'))
+    #owner = models.ForeignKey(to=myUser, on_delete=models.CASCADE)
 
     # EMAIL_FIELD = "email"
     USERNAME_FIELD = "email"
@@ -45,3 +48,6 @@ class myUser_for_mobile(AbstractBaseUser):
 
             'access': str(refresh)
         }
+
+    #def __str__(self):
+    #    return str(self.owner) + 's income'

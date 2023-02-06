@@ -12,11 +12,19 @@ class Type_item(models.Model):
     def __str__(self):
         return self.name_type
 
+class location(models.Model):
+    id = models.AutoField(primary_key=True)
+    City = models.CharField(max_length=250)
+    stats=models.IntegerField()
+    def __str__(self):
+        return self.City
+
+
 class Post(modul.TrackingModel):
     id = models.AutoField(primary_key=True)
     Name = models.CharField(max_length=250)
     image = models.ImageField(upload_to='photo/%y/%m/%d',default='default/1.png')
-    location = models.CharField(max_length=250)
+    location_id = models.ForeignKey(location, on_delete=models.CASCADE,default=1)
     phone_number = models.IntegerField(default=12345)
     By_user= models.BooleanField(default=False)
     Date = models.DateField(auto_created=True,default=timezone.now)

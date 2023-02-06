@@ -1,7 +1,11 @@
+import rest_framework_simplejwt
 from rest_framework import generics, status, views, permissions
+from rest_framework.generics import RetrieveUpdateDestroyAPIView
+from rest_framework.permissions import DjangoModelPermissions
+
 from .serializer import RegisterSerializer_for_mobile, \
     EmailVerificationSerializer_for_mobile, LoginSerializer_for_mobile, ResetPasswordEmailRequestSerializer_for_mobile, \
-    SetNewPasswordSerializer_for_mobile, LogoutSerializer_for_mobile
+    SetNewPasswordSerializer_for_mobile, LogoutSerializer_for_mobile, ExpensesSerializer_mobile
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import  myUser_for_mobile
@@ -19,6 +23,18 @@ from django.urls import reverse
 
 from django.http import HttpResponsePermanentRedirect
 import os
+
+
+from rest_framework import permissions
+
+
+class IsOwner(permissions.BasePermission):
+
+    def has_object_permission(self, request, view, obj):
+
+        return obj.email == request.user
+
+
 
 class CustomRedirect(HttpResponsePermanentRedirect):
     allowed_schemes = [os.environ.get('APP_SCHEME'), 'http', 'https']
@@ -154,3 +170,17 @@ class LogoutAPIView_for_mobile(generics.GenericAPIView):
         serializer.save()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class DeleteAccount_mobile(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = ExpensesSerializer_mobile
+    permission_classes = [DjangoModelPermissions]
+
+    queryset = myUser_for_mobile.objects.all()
+    lookup_field = "id"
+
+    def get_queryset(self):
+
+        return self.queryset.filter()# super(AccountInstance, self).delete(request, *args, **kwargs)
+
+

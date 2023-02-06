@@ -1,6 +1,11 @@
 from rest_framework import generics, status, views, permissions
+from rest_framework.generics import RetrieveUpdateDestroyAPIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
+
 from .serializer import RegisterSerializer, SetNewPasswordSerializer, ResetPasswordEmailRequestSerializer, \
-    EmailVerificationSerializer, LoginSerializer, LogoutSerializer, RegisterSerializer_for_mobile
+    EmailVerificationSerializer, LoginSerializer, LogoutSerializer, RegisterSerializer_for_mobile,  \
+    ExpensesSerializer
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import myUser
@@ -18,6 +23,15 @@ from django.urls import reverse
 
 from django.http import HttpResponsePermanentRedirect
 import os
+
+from rest_framework import permissions
+
+
+class IsOwner(permissions.BasePermission):
+
+    def has_object_permission(self, request, view, obj):
+        return obj.is_superuser == request.user
+
 
 
 class CustomRedirect(HttpResponsePermanentRedirect):
@@ -186,6 +200,19 @@ class LogoutAPIView(generics.GenericAPIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class DeleteAPIView(generics.DestroyAPIView):
-    def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
+
+
+
+
+
+class DeleteAccount(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = ExpensesSerializer
+    permission_classes = [IsAuthenticated]
+    queryset = myUser.objects.all()
+    lookup_field = "id"
+
+    def get_queryset(self):
+        return self.queryset.filter()# super(AccountInstance, self).delete(request, *args, **kwargs)
+
+
+
