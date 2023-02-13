@@ -45,6 +45,7 @@ class myUser_for_mobile(AbstractBaseUser,AnonymousUser):
     def token(self):
         refresh = AccessToken.for_user(self)
         return {
+            
 
             'access': str(refresh)
         }

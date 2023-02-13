@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'helpers',
     'mafqodatAPI',
+
     'Todo',
     'mafqodatuser',
     'coreapi',
@@ -76,6 +77,7 @@ REST_FRAMEWORK = {
     ],
 
 }
+
 
 
 SIMPLE_JWT = {

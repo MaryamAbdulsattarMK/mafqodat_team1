@@ -5,11 +5,23 @@ from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import filters
-from .serializer import PostSerializer, Type_itemSerializer, PostForMobileSerializer
+from .serializer import PostSerializer, Type_itemSerializer, PostForMobileSerializer, PostDetailSerialzer, \
+    PostDetailSerialzer_for_mobile, RegionSerialzere
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, CreateAPIView
 
-from .models import Post, Type_item
+from .models import Post, Type_item, PostTimeDetail
 from django_filters.rest_framework import DjangoFilterBackend
+
+
+
+
+class queryPostTimeDetailAPIView_for_mobile(CreateAPIView):
+    """This endpoint list all of the available todos from the database"""
+    permission_classes = (IsAuthenticated,)  # permission classes
+    serializer_class = PostDetailSerialzer_for_mobile
+
+    def get_queryset(self):
+        return PostTimeDetail.objects.filter('')
 
 
 class PostAPIView(ListCreateAPIView):
@@ -17,15 +29,15 @@ class PostAPIView(ListCreateAPIView):
     permission_classes = (IsAuthenticated,)  # permission classes
     serializer_class = PostSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['Name', 'location_id', 'phone_number']
-    search_feilds = ['Name', 'location_id', 'phone_number']
-    ordering_feilds = ['Name', 'location_id', 'phone_number']
+    filterset_fields = ['Name', 'location_id', 'phone_number','is_checked_by_admin']
+    search_feilds = ['Name', 'location_id', 'phone_number','is_checked_by_admin']
+    ordering_feilds = ['Name', 'location_id', 'phone_number','is_checked_by_admin']
 
     def perform_create(self, serializer):
         return serializer.save()
 
     def get_queryset(self):
-        return Post.objects.filter().values()
+        return Post.objects.filter()
 
 
 class Postfor_mobile_APIView(ListCreateAPIView):
@@ -33,15 +45,44 @@ class Postfor_mobile_APIView(ListCreateAPIView):
     permission_classes = (IsAuthenticated,)  # permission classes
     serializer_class = PostForMobileSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['Name', 'location_id', 'type_id']
-    search_feilds = ['Name', 'location_id', 'type_id']
-    ordering_feilds = ['Name', 'location_id', 'type_id']
+    filterset_fields = ['Name', 'location_id', 'type_id','is_checked_by_admin']
+    search_feilds = ['Name', 'location_id', 'type_id','is_checked_by_admin']
+    ordering_feilds = ['Name', 'location_id', 'type_id','is_checked_by_admin']
 
     def perform_create(self, serializer):
+        #queryPostTimeDetailAPIView_for_mobile('http://127.0.0.1:8000/api/admin/Post_History')
         return serializer.save()
 
     def get_queryset(self):
-        return Post.objects.defer("id", "Name", "location", "type_id", "image")
+        return Post.objects.filter()
+
+
+
+class PostTimeDetailAPIView(ListCreateAPIView):
+    """This endpoint list all of the available todos from the database"""
+    permission_classes = (IsAuthenticated,)  # permission classes
+    serializer_class = PostDetailSerialzer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['created_at','updated_at']
+    search_feilds = ['created_at','updated_at']
+    ordering_feilds = ['created_at','updated_at']
+
+
+    def get_queryset(self):
+        return PostTimeDetail.objects.defer("id", 'created_at','updated_at')
+
+
+class PostTimeDetail_for_mobileAPIView(ListCreateAPIView):
+    """This endpoint list all of the available todos from the database"""
+    permission_classes = (IsAuthenticated,)  # permission classes
+    serializer_class = PostDetailSerialzer_for_mobile
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['created_at','updated_at']
+    search_feilds = ['created_at','updated_at']
+    ordering_feilds = ['created_at','updated_at']
+
+    def get_queryset(self):
+        return PostTimeDetail.objects.defer("id", 'created_at','updated_at')
 
 
 class PostDetailAPIView(RetrieveUpdateDestroyAPIView):
@@ -54,6 +95,10 @@ class PostDetailAPIView(RetrieveUpdateDestroyAPIView):
         return Post.objects.filter()
 
 
+
+
+
+
 class PostDetailAPIView_for_mobile(RetrieveUpdateDestroyAPIView):
     """This endpoint list all of the available todos from the database"""
     permission_classes = (IsAuthenticated,)  # permission classes
@@ -61,7 +106,31 @@ class PostDetailAPIView_for_mobile(RetrieveUpdateDestroyAPIView):
     lookup_field = 'id'
 
     def get_queryset(self):
-        return Post.objects.defer("id", "Name", "location_id", "type_id", "image")
+        return Post.objects.defer("id", "Name", "location_id", "type_id", "image",'PostDetail')
+
+
+
+
+class PostTimeDetailAPIView_id(RetrieveUpdateDestroyAPIView):
+    """This endpoint list all of the available todos from the database"""
+    permission_classes = (IsAuthenticated,)  # permission classes
+    serializer_class = PostDetailSerialzer
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        return PostTimeDetail.objects.filter()
+class PostTimeDetailAPIView_for_mobile(RetrieveUpdateDestroyAPIView):
+    """This endpoint list all of the available todos from the database"""
+    permission_classes = (IsAuthenticated,)  # permission classes
+    serializer_class = PostDetailSerialzer_for_mobile
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        return PostTimeDetail.objects.filter()
+
+
+
+
 
 
 class Type_ItemAPIView(CreateAPIView):
@@ -74,7 +143,7 @@ class Type_ItemAPIView(CreateAPIView):
         return serializer.save()
 
     def get_queryset(self):
-        return Type_item.objects.filter().values()
+        return Type_item.objects.filter()
 
 
 class Type_ItemDetailAPIView(RetrieveUpdateDestroyAPIView):
@@ -92,3 +161,30 @@ def SaveFile(request):
     file = request.FILES['image']
     file_name = default_storage.save(file.name, file)
     return JsonResponse(file_name, safe=False)
+
+
+
+class RegionAPIView(RetrieveUpdateDestroyAPIView):
+    """This endpoint list all of the available todos from the database"""
+    permission_classes = (IsAuthenticated,)  # permission classes
+    serializer_class = RegionSerialzere
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        return Post.objects.defer('city','Region')
+
+
+class RegionAPIViewUP(ListCreateAPIView):
+    """This endpoint list all of the available todos from the database"""
+    permission_classes = (IsAuthenticated,)  # permission classes
+    serializer_class = RegionSerialzere
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['Region']
+    search_feilds = ['Region']
+    ordering_feilds = ['Region']
+
+    def perform_create(self, serializer):
+        return serializer.save()
+
+    def get_queryset(self):
+        return Post.objects.filter()
