@@ -17,11 +17,6 @@ class Type_item(models.Model):
 
 
 
-
-
-
-
-
 class location(models.Model):
     id = models.AutoField(primary_key=True)
     country=models.CharField(default="Iraq",max_length=255)
@@ -29,15 +24,19 @@ class location(models.Model):
     address=models.CharField(max_length=255)
     latitude=models.FloatField()
     longitude=models.FloatField()
-
     def __str__(self):
         return self.City
-class Region(modul.TrackingModel):
+
+
+
+class Regions(modul.TrackingModel):
     id = models.AutoField(primary_key=True)
-    city= models.ForeignKey( location,on_delete=models.CASCADE,default=5)
-    Region= models.CharField(max_length=255)
+    region= models.CharField(max_length=255)
+    city = models.ForeignKey(location, on_delete=models.CASCADE, default=5)
     def __str__(self):
-        return self.Region
+        return self.City
+
+
 
 def in_three_days():
     return timezone.now() + timedelta(days=3)
@@ -57,7 +56,7 @@ class Post(modul.TrackingModel):
     id = models.AutoField(primary_key=True)
     Name = models.CharField(max_length=250)
     image = models.ImageField(upload_to='photo/%y/%m/%d',default='default/1.png')
-    location = models.ForeignKey(Region, on_delete=models.CASCADE,default=1)
+    location = models.ForeignKey(Regions, on_delete=models.CASCADE)
     phone_number = models.IntegerField(default=12345)
     #By_user= models.ForeignKey(mod.myUser,on_delete=models.CASCADE,default=mod.myUser.id)
     Date = models.DateField(auto_created=True,default=timezone.now)

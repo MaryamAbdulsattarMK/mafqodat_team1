@@ -4,7 +4,7 @@ from operator import add
 from drf_writable_nested import WritableNestedModelSerializer
 from rest_framework import serializers
 from django.utils import timezone
-from .models import Post, Type_item, location, PostTimeDetail, Region
+from .models import Post, Type_item, location, PostTimeDetail, Regions
 
 
 class Base64ImageField(serializers.ImageField):
@@ -126,8 +126,8 @@ class PostForMobileSerializer(WritableNestedModelSerializer,serializers.ModelSer
 class RegionSerialzere(serializers.ModelSerializer):
 
     class Meta:
-        model = Region
-        fields = ('id','city','Region')
+        model = Regions
+        fields = ('region','city')
 
 
 

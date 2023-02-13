@@ -15,6 +15,34 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 
 
+
+
+class RegionAPIView(RetrieveUpdateDestroyAPIView):
+    """This endpoint list all of the available todos from the database"""
+    permission_classes = (IsAuthenticated,)  # permission classes
+    serializer_class = RegionSerialzere
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        return Post.objects.filter()
+
+
+class RegionAPIViewUP(ListCreateAPIView):
+    """This endpoint list all of the available todos from the database"""
+    permission_classes = (IsAuthenticated,)  # permission classes
+    serializer_class = RegionSerialzere
+
+
+    def perform_create(self, serializer):
+        return serializer.save()
+
+    def get_queryset(self):
+        return Post.objects.filter()
+
+
+
+
+
 class queryPostTimeDetailAPIView_for_mobile(CreateAPIView):
     """This endpoint list all of the available todos from the database"""
     permission_classes = (IsAuthenticated,)  # permission classes
@@ -29,9 +57,9 @@ class PostAPIView(ListCreateAPIView):
     permission_classes = (IsAuthenticated,)  # permission classes
     serializer_class = PostSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['Name', 'location_id', 'phone_number','is_checked_by_admin']
-    search_feilds = ['Name', 'location_id', 'phone_number','is_checked_by_admin']
-    ordering_feilds = ['Name', 'location_id', 'phone_number','is_checked_by_admin']
+    filterset_fields = ['Name', 'location', 'phone_number','is_checked_by_admin']
+    search_feilds = ['Name', 'location', 'phone_number','is_checked_by_admin']
+    ordering_feilds = ['Name', 'location', 'phone_number','is_checked_by_admin']
 
     def perform_create(self, serializer):
         return serializer.save()
@@ -45,9 +73,9 @@ class Postfor_mobile_APIView(ListCreateAPIView):
     permission_classes = (IsAuthenticated,)  # permission classes
     serializer_class = PostForMobileSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['Name', 'location_id', 'type_id','is_checked_by_admin']
-    search_feilds = ['Name', 'location_id', 'type_id','is_checked_by_admin']
-    ordering_feilds = ['Name', 'location_id', 'type_id','is_checked_by_admin']
+    filterset_fields = ['Name', 'location', 'type_id','is_checked_by_admin']
+    search_feilds = ['Name', 'location', 'type_id','is_checked_by_admin']
+    ordering_feilds = ['Name', 'location', 'type_id','is_checked_by_admin']
 
     def perform_create(self, serializer):
         #queryPostTimeDetailAPIView_for_mobile('http://127.0.0.1:8000/api/admin/Post_History')
@@ -106,7 +134,7 @@ class PostDetailAPIView_for_mobile(RetrieveUpdateDestroyAPIView):
     lookup_field = 'id'
 
     def get_queryset(self):
-        return Post.objects.defer("id", "Name", "location_id", "type_id", "image",'PostDetail')
+        return Post.objects.defer("id", "Name", "location", "type_id", "image",'PostDetail')
 
 
 
@@ -162,29 +190,3 @@ def SaveFile(request):
     file_name = default_storage.save(file.name, file)
     return JsonResponse(file_name, safe=False)
 
-
-
-class RegionAPIView(RetrieveUpdateDestroyAPIView):
-    """This endpoint list all of the available todos from the database"""
-    permission_classes = (IsAuthenticated,)  # permission classes
-    serializer_class = RegionSerialzere
-    lookup_field = 'id'
-
-    def get_queryset(self):
-        return Post.objects.defer('city','Region')
-
-
-class RegionAPIViewUP(ListCreateAPIView):
-    """This endpoint list all of the available todos from the database"""
-    permission_classes = (IsAuthenticated,)  # permission classes
-    serializer_class = RegionSerialzere
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['Region']
-    search_feilds = ['Region']
-    ordering_feilds = ['Region']
-
-    def perform_create(self, serializer):
-        return serializer.save()
-
-    def get_queryset(self):
-        return Post.objects.filter()

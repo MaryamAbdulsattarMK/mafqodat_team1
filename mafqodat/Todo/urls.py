@@ -13,8 +13,8 @@ urlpatterns = [
     path('admin/Type_item/<int:id>', Type_ItemDetailAPIView.as_view(), name='Post_Detail'),
     path('admin/Post_History', PostTimeDetailAPIView.as_view(), name='Post_History'),
     path('admin/Post_History/<int:id>', PostTimeDetailAPIView_id.as_view(), name='Post_History'),
-    path('admin/Region', RegionAPIView.as_view(), name='RegionAPIView'),
-    path('admin/Region/<int:id>', RegionAPIViewUP.as_view(), name='Region'),
+    path('admin/Region', RegionAPIViewUP.as_view(), name='RegionAPIView'),
+    path('admin/Region/<int:id>', RegionAPIView.as_view(), name='Region'),
 
 
 
@@ -24,8 +24,8 @@ urlpatterns = [
     path('mobile/Post/<int:id>', PostDetailAPIView_for_mobile.as_view(), name='Post_Detail'),
     path('mobile/Post_History', PostTimeDetail_for_mobileAPIView.as_view(), name='Post_History'),
     path('mobile/Post_History/<int:id>',  PostTimeDetailAPIView_for_mobile.as_view(), name='Post_History'),
-    path('mobile/Region', RegionAPIView.as_view(), name='RegionAPIView'),
-    path('mobile/Region/<int:id>', RegionAPIViewUP.as_view(), name='Region'),
+    path('mobile/Region', RegionAPIViewUP.as_view(), name='RegionAPIView'),
+    path('mobile/Region/<int:id>', RegionAPIView.as_view(), name='Region'),
 
 
 
